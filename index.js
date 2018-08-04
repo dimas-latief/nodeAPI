@@ -48,7 +48,7 @@ var server = http.createServer(function(req, res) {
         // Logging out the request path, when we looking at the terminal
         // console.log('Request received on path:' + trimmedPath + ' with this method: ' + method + ' and with these query string parameters', queryStringObject);
         // console.log('Request received with these headers: ', headers);
-        console.log('Request received with this payload: ', buffer);
+        console.log('Request received with this payload: ', buffer); // we are on building rest ful API on payload
     })
 
 });
