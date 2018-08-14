@@ -7,12 +7,63 @@
 
 // first use the HTTP module to define what the server does
 var http = require('http');
+var https = require('https');
 var url = require('url');
 var StringDecoder = require('string_decoder').StringDecoder;
 var config = require('./config');
+var fs = require('fs');
 
-// Server should response all request with a string
-var server = http.createServer(function(req, res) {
+// Instantiating the HTTP server
+var httpServer = http.createServer(function(req, res) {
+    unifiedServer(req, res);
+});
+
+// instantinate the HTTPS server
+var httpsServer = https.createServer(httpsServerOptions,function(req, res) {
+    unifiedServer(req, res);
+});
+
+var httpsServerOptions = {
+    'key' : fs.readFileSync('./https/key.pem'),
+    'cert' : fs.readFileSync('./https/cert.pem')
+}
+
+// start the https server
+httpsServer.listen(config.httpsPort, function(){
+    console.log("The server is listening on port "+config.httpsPort);
+});
+
+// Start the server
+httpServer.listen(config.httpPort, function(){
+    // callback is to tell us the server is done listening
+    console.log("The server is listening on port "+config.httpPort);
+});
+
+// Define the handlers
+var handlers = {};
+
+// Sample handler
+handlers.sample = function(data, callback){
+    // Callback a http status code, and a payload object
+    callback(406, {'name': 'sample handler'});
+};
+
+// Not found handler
+handlers.notFound = function(data, callback){
+    callback(404)
+};
+
+// Define a request router
+var router = {
+    'sample' : handlers.sample
+};
+
+// We need to share which resources people are requesting when they sent request to the API
+
+// So req have .method, .url
+
+// All logics for both http and https
+var unifiedServer = function (req, res) {
     // Get the URL and parse it
     var parsedURL = url.parse(req.url, true);
 
@@ -82,34 +133,4 @@ var server = http.createServer(function(req, res) {
         // console.log('Request received with these headers: ', headers);
         // console.log('Request received with this payload: ', buffer); // we are on building rest ful API on payload
     })
-
-});
-
-// Start the server
-server.listen(config.port, function(){
-    // callback is to tell us the server is done listening
-    console.log("The server is listening on port "+config.port+" in "+config.envName+" mode");
-});
-
-// Define the handlers
-var handlers = {};
-
-// Sample handler
-handlers.sample = function(data, callback){
-    // Callback a http status code, and a payload object
-    callback(406, {'name': 'sample handler'});
-};
-
-// Not found handler
-handlers.notFound = function(data, callback){
-    callback(404)
-};
-
-// Define a request router
-var router = {
-    'sample' : handlers.sample
-};
-
-// We need to share which resources people are requesting when they sent request to the API
-
-// So req have .method, .url
+}
