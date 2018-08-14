@@ -1,74 +1,65 @@
 /**
- * Library for storing and editing data
+ * DAO
  */
 
-// Dependencies
+//  dependencies
 var fs = require('fs');
 var path = require('path');
 
-// Container for the module (to be exported)
+// create module to export
 var lib = {};
 
-// Base directory of the data folder
 lib.baseDir = path.join(__dirname, '/../.data/');
 
-// Write data to a file
-lib.create = function(dir, file, data, callback) {
-    // Open the file for writing
-    fs.open(lib.baseDir+dir+'/'+file+'.json','wx', function(err, fileDescriptor){
-        if(!err && fileDescriptor){
-            // Convert data to string
+// create a file and write it
+lib.create = function(dir, file, data, callback){
+    fs.open(lib.baseDir+dir+'/'+file+'.json', 'wx', function(err, fileDescriptor){
+        if (!err && fileDescriptor) {
             var stringData = JSON.stringify(data);
-
-            // Write to file and close it
             fs.writeFile(fileDescriptor, stringData, function(err){
                 if (!err) {
                     fs.close(fileDescriptor, function(err){
                         if (!err) {
-                            callback(false);
+                            callback(false)
                         } else {
-                            callback('Error closing new file')
+                            callback('cannot close the file')
                         }
                     })
                 } else {
-                    callback('Error writing to new file');
+                    callback('cannot write file')
                 }
             })
         } else {
-            callback('Could not create new file, it may already exist');
+            callback('Perhaps file is already exist')
         }
     })
 }
 
-// Read data from a file
+// reading file
 lib.read = function(dir, file, callback){
     fs.readFile(lib.baseDir+dir+'/'+file+'.json', 'utf8', function(err, data){
         callback(err, data);
     })
 }
 
-// update data
+// updating data
 lib.update = function(dir, file, data, callback){
-    // open the file for writing
     fs.open(lib.baseDir+dir+'/'+file+'.json', 'r+', function(err, fileDescriptor){
         if (!err && fileDescriptor) {
-            // getting the data
             var stringData = JSON.stringify(data);
-            // truncating the file before write
             fs.truncate(fileDescriptor, function(err){
                 if (!err) {
-                    // write to the file and close it
                     fs.writeFile(fileDescriptor, stringData, function(err){
-                        if (!err) {
+                        if (!err) {condition
                             fs.close(fileDescriptor, function(err){
                                 if (!err) {
-                                    callback(false)  
+                                    callback(false)
                                 } else {
-                                    callback('error closing the file')
+                                    callback('Close is not here')
                                 }
                             })
                         } else {
-                            callback('writing to existing file')
+                           callback('you cannot write data') 
                         }
                     })
                 } else {
@@ -76,14 +67,13 @@ lib.update = function(dir, file, data, callback){
                 }
             })
         } else {
-            callback('cannot open the file')
+            callback('there is no file with that name')
         }
-    });
+    })
 }
 
-// deleting a file
+// Deleting a file
 lib.delete = function(dir, file, callback){
-    // unlinking the file
     fs.unlink(lib.baseDir+dir+'/'+file+'.json', function(err){
         if (!err) {
             callback(false)
@@ -93,5 +83,5 @@ lib.delete = function(dir, file, callback){
     })
 }
 
-// export
+// exporting module
 module.exports = lib;
