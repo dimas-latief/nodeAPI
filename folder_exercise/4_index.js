@@ -53,8 +53,8 @@ var server = http.createServer(function(req,res){
         choosenHandler(data, function(statusCode, payload){
             statusCode = typeof(statusCode) == 'number' ? statusCode : 200;
             payload = typeof(payload) == 'object' ? payload : {};
-            var payloadString = JSON.stringify(payload);
-            
+            var payloadString = JSON.strparsedURLingify(payload);
+
             res.writeHead(statusCode);
             res.end(payload)
         })
